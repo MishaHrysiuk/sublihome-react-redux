@@ -1,11 +1,11 @@
-import { useDeleteHeroMutation } from '../../api/apiSlice';
+import { useDeleteProductMutation } from '../../api/apiSlice';
 
 const HeroesListItem = ({id, name, price, productType}) => {
 
     const [deleteHero, {
         isLoading,
         isSuccess
-    }] = useDeleteHeroMutation();
+    }] = useDeleteProductMutation();
 
     let elementClassName;
     

@@ -1,19 +1,17 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
-
-import { selectAll } from '../heroesFilters/filtersSlice';
-import { useCreateHeroMutation } from '../../api/apiSlice';
+import { useCreateProductMutation, useGetAllProductTypesQuery } from '../../api/apiSlice';
 
 const HeroesAddForm = () => {
-    // Состояния для контроля формы
     const [productName, setProductName] = useState('');
     const [productType, setProductType] = useState('');
     const [productPrice, setProductPrice] = useState('');
 
-    const [createProduct] = useCreateHeroMutation();
+    const [createProduct, Product] = useCreateProductMutation();
 
-    const { filtersLoadingStatus } = useSelector(state => state.filters);
-    const filters = useSelector(selectAll);
+    const {
+        data: filters,
+        ...ProductType
+    } = useGetAllProductTypesQuery();
 
     const onSubmitHandler = (e) => {
         e.preventDefault();
@@ -31,10 +29,10 @@ const HeroesAddForm = () => {
         setProductPrice('');
     }
 
-    const renderFilters = (filters, status) => {
-        if (status === "loading") {
+    const renderFilters = (filters) => {
+        if (ProductType.isLoading) {
             return <option>Загрузка элементов</option>
-        } else if (status === "error") {
+        } else if (ProductType.isError) {
             return <option>Ошибка загрузки</option>
         }
         
@@ -85,11 +83,11 @@ const HeroesAddForm = () => {
                     value={productType}
                     onChange={(e) => setProductType(e.target.value)}>
                     <option value="">Виберіть тип...</option>
-                    {renderFilters(filters, filtersLoadingStatus)}
+                    {renderFilters(filters)}
                 </select>
             </div>
 
-            <button type="submit" className="btn btn-primary">Создать</button>
+            <button type="submit" className="btn btn-primary">{(Product.isLoading) ? 'Creating' : 'Create'}</button>
         </form>
     )
 }

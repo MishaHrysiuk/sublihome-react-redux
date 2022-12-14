@@ -1,26 +1,24 @@
-import {useHttp} from '../../hooks/http.hook';
-import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import classNames from 'classnames';
 
-import { activeFilterChanged, fetchFilters, selectAll } from './filtersSlice';
+import { activeFilterChanged } from '../../api/filtersSlice';
+import { useGetAllProductTypesQuery } from '../../api/apiSlice';
 import Spinner from '../spinner/Spinner';
 
 const HeroesFilters = () => {
 
-    const {filtersLoadingStatus, activeFilter} = useSelector(state => state.filters);
-    const filters = useSelector(selectAll);
+    const { activeFilter } = useSelector(state => state.filters);
+    const {
+        data: filters = [],
+        isLoading,
+        isError
+    } = useGetAllProductTypesQuery() 
+
     const dispatch = useDispatch();
-    const {request} = useHttp();
 
-    useEffect(() => {
-        dispatch(fetchFilters(request));
-        // eslint-disable-next-line
-    }, []);
-
-    if (filtersLoadingStatus === "loading") {
+    if (isLoading) {
         return <Spinner/>;
-    } else if (filtersLoadingStatus === "error") {
+    } else if (isError) {
         return <h5 className="text-center mt-5">Ошибка загрузки</h5>
     }
 

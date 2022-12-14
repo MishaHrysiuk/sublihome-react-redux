@@ -1,34 +1,75 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
-export const apiSlice = createApi({
-    reducerPath: 'api',
+export const apiProductSlice = createApi({
+    reducerPath: 'api/Product',
     baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/Product' }),
-    tagTypes: ['Products'],
+    tagTypes: ['Product'],
     endpoints: builder => ({
-        getHeroes: builder.query({
+        getAllProducts: builder.query({
             query: () => '/GetAllProducts',
-            providesTags: ['Products']
+            providesTags: ['Product']
         }),
-        createHero: builder.mutation({
-            query: hero => ({
+        getProduct: builder.query({
+            query: id => `/GetProduct?productId=${id}`
+        }),
+        createProduct: builder.mutation({
+            query: product => ({
                 url: '/CreateProduct',
                 method: 'POST',
-                body: hero
+                body: product
             }),
-            invalidatesTags: ['Products']
+            invalidatesTags: ['Product']
         }),
-        deleteHero: builder.mutation({
+        deleteProduct: builder.mutation({
             query: id => ({
                 url: `/DeleteProduct?productId=${id}`,
                 method: 'DELETE'
             }),
-            invalidatesTags: ['Products']
+            invalidatesTags: ['Product']
+        })
+    })
+});
+
+export const apiProductTypeSlice = createApi({
+    reducerPath: 'api/ProductType',
+    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/ProductType' }),
+    tagTypes: ['ProductType'],
+    endpoints: builder => ({
+        getAllProductTypes: builder.query({
+            query: () => '/GetAllProductTypes',
+            providesTags: ['ProductType']
+        }),
+        getProductType: builder.query({
+            query: id => `/GetProductType?productTypeId=${id}`
+        }),
+        createProductType: builder.mutation({
+            query: productType => ({
+                url: '/CreateProductType',
+                method: 'POST',
+                body: productType
+            }),
+            invalidatesTags: ['ProductType']
+        }),
+        deleteProductType: builder.mutation({
+            query: id => ({
+                url: `/DeleteProductType?productTypeId=${id}`,
+                method: 'DELETE'
+            }),
+            invalidatesTags: ['ProductType']
         })
     })
 });
 
 export const {
-    useGetHeroesQuery,
-    useCreateHeroMutation,
-    useDeleteHeroMutation
-} = apiSlice;
+    useGetAllProductsQuery,
+    useGetProductQuery,
+    useCreateProductMutation,
+    useDeleteProductMutation
+} = apiProductSlice;
+
+export const {
+    useGetAllProductTypesQuery,
+    useGetProductTypeQuery,
+    useCreateProductTypeMutation,
+    useDeleteProductTypeMutation
+} = apiProductTypeSlice;
