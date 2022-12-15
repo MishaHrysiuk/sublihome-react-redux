@@ -4,7 +4,7 @@ import { CSSTransition, TransitionGroup} from 'react-transition-group';
 
 import HeroesListItem from "../heroesListItem/HeroesListItem";
 import Spinner from '../spinner/Spinner';
-import { useGetAllProductsQuery } from '../../api/apiSlice';
+import { useGetAllProductsQuery, useGetProductQuery } from '../../api/apiSlice';
 
 import './heroesList.scss';
 
@@ -15,6 +15,10 @@ const HeroesList = () => {
         isLoading,
         isError,
     } = useGetAllProductsQuery();
+
+    const {
+        data: hero,
+    } = useGetProductQuery(51);
 
     const activeFilter = useSelector(state => state.filters.activeFilter)
     
@@ -58,6 +62,7 @@ const HeroesList = () => {
     }
 
     const elements = renderHeroesList(filteredHeroes);
+    console.log(hero)
     return (
         <TransitionGroup component="ul">
             {elements}

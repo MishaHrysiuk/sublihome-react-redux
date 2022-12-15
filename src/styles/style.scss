@@ -1,0 +1,26 @@
+$base-color: #01b3a7;
+$secondary-color: #162e44;
+
+html,
+body,
+#root {
+    height: 100%;
+}
+
+html{
+    overflow-y: scroll;
+}
+
+.sign{
+    background: $base-color;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 1170px;
+    margin: 0px auto;
+}
