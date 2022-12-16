@@ -1,5 +1,5 @@
 import ProductCard from "../product-card/product-card";
-import { Card, Spinner, Form, Row, Col, Pagination } from "react-bootstrap";
+import { Card, Spinner, Form, Row, Col, Pagination, Button } from "react-bootstrap";
 import { useMemo } from "react";
 
 import {
@@ -11,10 +11,11 @@ import {
 
 import { usePagging } from "../../hooks/pagging.hook";
 import { useFiltering } from "../../hooks/filtering.hook";
+import { useAuth } from "../../hooks/auth.hook";
 
 const ProductsPage = () => {
-    
-    const currentUserId = 1;
+
+    const { login, logout, currentUserId } = useAuth();
 
     const {
         currentPage,
@@ -90,12 +91,8 @@ const ProductsPage = () => {
     
     const filteredData = useMemo(() => {
         return dataFiltering(productList);
+        // eslint-disable-next-line
     }, [productList, search, type, maxPrice]);
-
-    // const items = renderCards(filteredData);
-    // const notFound = (!filteredData.length && !getAllProductsStatus.isLoading) ? <h1>Товари не знайдено</h1> : null;  
-    // const spinner = getAllProductsStatus.isLoading ? <Spinner animation="border" variant="info" /> : null;
-    // const content = !getAllProductsStatus.isLoading ? items : null;
 
     const renderContent = () => {
         if (!filteredData.length && getAllProductsStatus.isSuccess) {
@@ -113,6 +110,12 @@ const ProductsPage = () => {
 
     return (
         <div className="block">
+            <Button onClick={() => {
+                login({ email: 'admin@gmail.com', password: 'admin' });
+            }}>Login</Button>
+            <Button onClick={() => {
+                logout();
+            }}>Logout</Button>
             <div className="container">
                 <div className="block__title title">Наші товари</div>
                 <Card className="mb-3">

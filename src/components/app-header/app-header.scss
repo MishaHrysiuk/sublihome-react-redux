@@ -1,0 +1,65 @@
+@import "../../style/fonts";
+@import "../../style/none";
+@import "../../style/style.scss";
+
+.header {
+    background: $base-color;
+
+    a,
+    a:hover {
+            // font-size: 20px;
+            color: white;
+            text-decoration: none;
+            transition-duration: 0.5s;
+    }
+
+    .activated {
+        color: $secondary-color;
+    }
+
+    &__link {
+        color: #000;
+        &:hover {
+                font-size: 30px;
+                margin: 8px;
+                transition-duration: 0.5s;
+            }
+    }
+
+    &__row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        height: 60px;
+        justify-content: space-between;
+        align-items: center;
+        padding: 3px 20px;
+    }
+
+    &__logo {
+        font-family: "Hamerslag";
+        font-size: 40px;
+        position: relative;
+        top: -4px;
+    }
+
+    &__list-social {
+        display: flex;
+        position: relative;
+        top: 5px;
+
+        li {
+            list-style: none;
+
+            a {
+                font-size: 30px;
+                margin: 8px;
+                transition-duration: 0.5s;
+            }
+
+            &:hover a {
+                color: $secondary-color;
+            }
+        }
+    }
+}

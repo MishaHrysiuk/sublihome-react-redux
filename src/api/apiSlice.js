@@ -1,5 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
+const token = localStorage.getItem('user');
+
 export const apiAuthenticationSlice = createApi({
     reducerPath: 'api/Authentication',
     baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/Authentication' }),
@@ -16,11 +18,19 @@ export const apiAuthenticationSlice = createApi({
 
 export const apiProductSlice = createApi({
     reducerPath: 'api/Product',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/Product' }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://localhost:5001/api/Product',
+        prepareHeaders: (headers) => {
+            headers.set('authorization', `Bearer ${token}`)
+            return headers;
+        }
+    }),
     tagTypes: ['Product'],
     endpoints: builder => ({
         getAllProducts: builder.query({
-            query: () => '/GetAllProducts',
+            query: () => ({
+                url: '/GetAllProducts'
+            }),
             providesTags: ['Product']
         }),
         getProduct: builder.query({
@@ -65,11 +75,19 @@ export const apiProductSlice = createApi({
 
 export const apiCartSlice = createApi({
     reducerPath: 'api/Cart',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/Cart' }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://localhost:5001/api/Cart',
+        prepareHeaders: (headers) => {
+            headers.set('authorization', `Bearer ${token}`)
+            return headers;
+        }
+    }),
     tagTypes: ['Cart'],
     endpoints: builder => ({
         getItemsFromCart: builder.query({
-            query: id => `/GetItemsFromCart?userId=${id}`,
+            query: id => ({
+                url: `/GetItemsFromCart?userId=${id}`
+            }),
             providesTags: ['Cart']
         }),
         updateCart: builder.mutation({
@@ -92,7 +110,13 @@ export const apiCartSlice = createApi({
 
 export const apiProductTypeSlice = createApi({
     reducerPath: 'api/ProductType',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/ProductType' }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://localhost:5001/api/ProductType',
+        prepareHeaders: (headers) => {
+            headers.set('authorization', `Bearer ${token}`)
+            return headers;
+        }
+    }),
     tagTypes: ['ProductType'],
     endpoints: builder => ({
         getAllProductTypes: builder.query({
@@ -123,7 +147,13 @@ export const apiProductTypeSlice = createApi({
 
 export const apiOrderSlice = createApi({
     reducerPath: 'api/Order',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/Order' }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://localhost:5001/api/Order',
+        prepareHeaders: (headers) => {
+            headers.set('authorization', `Bearer ${token}`)
+            return headers;
+        }
+    }),
     tagTypes: ['Order'],
     endpoints: builder => ({
         getAllOrders: builder.query({
@@ -158,7 +188,13 @@ export const apiOrderSlice = createApi({
 
 export const apiUserSlice = createApi({
     reducerPath: 'api/User',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/User' }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: 'https://localhost:5001/api/User',
+        prepareHeaders: (headers) => {
+            headers.set('authorization', `Bearer ${token}`)
+            return headers;
+        }
+    }),
     tagTypes: ['User'],
     endpoints: builder => ({
         getAllUsers: builder.query({

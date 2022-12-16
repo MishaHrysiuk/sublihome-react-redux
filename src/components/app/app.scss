@@ -1,16 +1,71 @@
+.content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.wrapper {
+    min-height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    text-align: center;
+    font-weight: 700;
+    font-family: Arial;
+    font-size: 36px;
+    color: #162e44;
+    text-transform: uppercase;
+}
+
+.block {
+    &__bg {
+        &__lazur {
+            background: #01b3a7;
+        }
+    }
+
+    &__title {
+        margin: 20px auto 10px;
+
+        &__white {
+            color: white;
+        }
+    }
+
+    &__row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    &__column {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+    }
+
+    &__image {
+        margin: 10px;
+        max-height: 400px;
+    }
+}
+
+.carousel{
+    &__image{
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        object-position: 0% 50%;
+    }
+}
+
 .app {
     height: 100vh;
     overflow-y: scroll;
     //background: url('../../assets/hero_bg.jpg') center / cover no-repeat;
-}
-
-.content {
-    display: grid;
-    grid-template-columns: 560px 440px;
-    max-width: 1040px;
-    margin: 0 auto;
-    padding-top: 50px;
-    &__interactive {
-        padding-left: 40px;
-    }
 }
