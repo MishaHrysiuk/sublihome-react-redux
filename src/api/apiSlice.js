@@ -202,7 +202,8 @@ export const apiUserSlice = createApi({
             providesTags: ['User']
         }),
         getUser: builder.query({
-            query: id => `/GetUser?userId=${id}`
+            query: id => `/GetUser?userId=${id}`,
+            providesTags: ['User']
         }),
         createUser: builder.mutation({
             query: user => ({

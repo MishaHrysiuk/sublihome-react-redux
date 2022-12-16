@@ -1,5 +1,4 @@
 import { Card } from "react-bootstrap"
-import { authenticationService } from "../../services/auth-service"
 
 const AboutUsPage = () => {
     return (

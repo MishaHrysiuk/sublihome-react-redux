@@ -1,16 +1,23 @@
-import axios from "axios";
 import { Button, Card, Form, Col, Row, InputGroup, Spinner } from "react-bootstrap"
-import DefaultsAxios from "../../helpers/jwt-interceptor";
-import { authenticationService } from "../../services/auth-service"
-import { UserService } from "../../services/sublihome-service";
 import { useEffect, useState } from "react";
-import { errorInterceptor } from "../../helpers/error-interceptor";
 import { useNavigate } from "react-router-dom";
+import {
+    useGetUserQuery,
+    useUpdateUserMutation,
+    useUpdateUserPasswordMutation
+} from "../../api/apiSlice";
+
+import { useAuth } from "../../hooks/auth.hook";
 
 const ProfilePage = () => {
-    const userService = new UserService(axios.defaults.baseURL, DefaultsAxios);
-    const currentUserId = authenticationService.currentUserId;
-    const isAdmin = authenticationService.currentUserIsAdmin;
+    const {isLoggedIn, currentUserId, currentUserIsAdmin, logout } = useAuth()
+    const {
+        data: user,
+        isLoading,
+        isSuccess
+    } = useGetUserQuery(currentUserId);
+    const [updateUser] = useUpdateUserMutation();
+    const [updateUserPassword] = useUpdateUserPasswordMutation();
 
     const navigate = useNavigate();
 
@@ -24,21 +31,6 @@ const ProfilePage = () => {
     const [oldPassword, setOldPassword] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
-    const [loading, setLoading] = useState(true);
-
-
-    useEffect(() => {
-        onRequest();
-    }, [])
-
-    const onRequest = () => {
-        userService.getUser(currentUserId)
-            .then(onUserLoaded)
-            .catch(err => {
-                setLoading(false);
-                errorInterceptor(err)
-            })
-    }
 
     const onUserLoaded = (user) => {
         setFirstName(user.firstName)
@@ -48,22 +40,27 @@ const ProfilePage = () => {
         setHouseNumber(user.address ? +user.address.split(', ')[2] : 0)
         setPhoneNumber(user.phoneNumber.slice(4))
         setEmail(user.email)
-        setLoading(false)
     }
+
+    useEffect(() => {
+        if (isSuccess) {
+            onUserLoaded(user);
+        }
+    }, [user])
+    
 
     function onUpdateUser(e) {
         e.preventDefault()
         if ((!!email && !!firstName && !!lastName && !!city && !!street && !!houseNumber && !!phoneNumber)) {
-            userService.updateUser({
+            updateUser({
                 id: currentUserId,
                 firstName,
                 lastName,
                 address: `${city}, ${street}, ${houseNumber}`,
                 phoneNumber: `+380${phoneNumber}`,
-                email
-            }).then(res => {
-                alert('Saved!')
-            }).catch(errorInterceptor)
+                email})
+                .unwrap()
+                .then(res => { alert('Saved!') })
         }
     }
     
@@ -71,18 +68,20 @@ const ProfilePage = () => {
         e.preventDefault()
         console.log(e.target.getElementsByTagName('input'))
         if ((!!oldPassword && !!password && (password === passwordConfirm))) {
-            userService.updateUserPassword({
+            updateUserPassword({
                 userId: currentUserId,
                 oldPassword,
                 newPassword: password
-            }).then(res => {
-                alert('Password change')
-                e.target.getElementsByTagName('input')[2].style.backgroundColor = '#FFFFFF';
-                e.target.getElementsByTagName('input')[2].style.color = '#000000';  
-                setOldPassword('')
-                setPassword('')
-                setPasswordConfirm('')
-            }).catch(errorInterceptor)
+            })
+                .unwrap()
+                .then(res => {
+                    alert('Password change')
+                    e.target.getElementsByTagName('input')[2].style.backgroundColor = '#FFFFFF';
+                    e.target.getElementsByTagName('input')[2].style.color = '#000000';  
+                    setOldPassword('')
+                    setPassword('')
+                    setPasswordConfirm('')
+                })
         }
     }
 
@@ -208,8 +207,8 @@ const ProfilePage = () => {
                         </Row>
                         <div style={{display: 'flex', justifyContent: 'space-between'}}>
                             <Button style={{justifySelf: 'center'}} className="m-2" variant="success" type="submit">Змінити пароль</Button>
-                            { isAdmin ? <Button onClick={() => navigate('/admin')} className="m-2" variant="warning">Адмін панель</Button> : null}
-                            <Button style={{alignSelf: 'center'}} className="m-2" variant="danger" onClick={authenticationService.logout}>Вийти з профіля</Button>
+                            { currentUserIsAdmin ? <Button onClick={() => navigate('/admin')} className="m-2" variant="warning">Адмін панель</Button> : null}
+                            <Button style={{alignSelf: 'center'}} className="m-2" variant="danger" onClick={logout}>Вийти з профіля</Button>
                         </div>
                     </Form>
                         </Card.Body>
@@ -218,8 +217,8 @@ const ProfilePage = () => {
     }
 
     const card = getCard();
-    const spinner = loading ? <Spinner animation="border" variant="info" /> : null;
-    const content = !loading ? card : null;
+    const spinner = isLoading ? <Spinner animation="border" variant="info" /> : null;
+    const content = !isLoading && isSuccess ? card : null;
 
 
     return (
