@@ -2,46 +2,34 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 const token = localStorage.getItem('user');
 
-export const apiAuthenticationSlice = createApi({
-    reducerPath: 'api/Authentication',
-    baseQuery: fetchBaseQuery({ baseUrl: 'https://localhost:5001/api/Authentication' }),
-    endpoints: builder => ({
-        login: builder.mutation({
-            query: body => ({
-                url: '/Login',
-                method: 'POST',
-                body: body
-            })
-        })
-    })
-});
-
-export const apiProductSlice = createApi({
-    reducerPath: 'api/Product',
+export const apiSlice = createApi({
+    reducerPath: 'api',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'https://localhost:5001/api/Product',
+        baseUrl: 'https://localhost:5001/api',
         prepareHeaders: (headers) => {
             headers.set('authorization', `Bearer ${token}`)
             return headers;
         }
     }),
-    tagTypes: ['Product'],
+    tagTypes: ['Product', 'Order', 'Cart', 'ProductType', 'User'],
     endpoints: builder => ({
         getAllProducts: builder.query({
             query: () => ({
-                url: '/GetAllProducts'
+                url: '/Product/GetAllProducts'
             }),
             providesTags: ['Product']
         }),
         getProduct: builder.query({
-            query: id => `/GetProduct?productId=${id}`
+            query: id => `/Product/GetProduct?productId=${id}`,
+            providesTags: ['Product']
         }),
         downloadPictureFromProduct: builder.query({
-            query: id => `/DownloadPictureFromProduct?productId=${id}`
+            query: id => `/Product/DownloadPictureFromProduct?productId=${id}`,
+            providesTags: ['Product']
         }),
         createProduct: builder.mutation({
             query: product => ({
-                url: '/CreateProduct',
+                url: '/Product/CreateProduct',
                 method: 'POST',
                 body: product
             }),
@@ -49,7 +37,7 @@ export const apiProductSlice = createApi({
         }),
         addPictureToProduct: builder.mutation({
             query: (id, file) => ({
-                url: `/AddPictureToProduct?productId=${id}`,
+                url: `/Product/AddPictureToProduct?productId=${id}`,
                 method: 'POST',
                 body: file
             }),
@@ -57,42 +45,35 @@ export const apiProductSlice = createApi({
         }),
         deleteProduct: builder.mutation({
             query: id => ({
-                url: `/DeleteProduct?productId=${id}`,
+                url: `/Product/DeleteProduct?productId=${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: ['Product']
         }),
         updateProduct: builder.mutation({
             query: product => ({
-                url: '/UpdateProduct',
+                url: '/Product/UpdateProduct',
                 method: 'PUT',
                 body: product
             }),
             invalidatesTags: ['Product']
-        })
-    })
-});
-
-export const apiCartSlice = createApi({
-    reducerPath: 'api/Cart',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://localhost:5001/api/Cart',
-        prepareHeaders: (headers) => {
-            headers.set('authorization', `Bearer ${token}`)
-            return headers;
-        }
-    }),
-    tagTypes: ['Cart'],
-    endpoints: builder => ({
+        }),
+        login: builder.mutation({
+            query: body => ({
+                url: '/Authentication/Login',
+                method: 'POST',
+                body: body
+            })
+        }),
         getItemsFromCart: builder.query({
             query: id => ({
-                url: `/GetItemsFromCart?userId=${id}`
+                url: `/Cart/GetItemsFromCart?userId=${id}`
             }),
-            providesTags: ['Cart']
+            providesTags: ['Cart', 'Order']
         }),
         updateCart: builder.mutation({
             query: cart => ({
-                url: '/UpdateCart',
+                url: '/Cart/UpdateCart',
                 method: 'POST',
                 body: cart
             }),
@@ -100,36 +81,22 @@ export const apiCartSlice = createApi({
         }),
         clearCart: builder.mutation({
             query: id => ({
-                url: `/ClearCart?userId=${id}`,
+                url: `/Cart/ClearCart?userId=${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: ['Cart']
-        })
-    })
-});
-
-export const apiProductTypeSlice = createApi({
-    reducerPath: 'api/ProductType',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://localhost:5001/api/ProductType',
-        prepareHeaders: (headers) => {
-            headers.set('authorization', `Bearer ${token}`)
-            return headers;
-        }
-    }),
-    tagTypes: ['ProductType'],
-    endpoints: builder => ({
+        }),
         getAllProductTypes: builder.query({
-            query: () => '/GetAllProductTypes',
+            query: () => '/ProductType/GetAllProductTypes',
             providesTags: ['ProductType']
         }),
         getProductType: builder.query({
-            query: id => `/GetProductType?productTypeId=${id}`,
+            query: id => `/ProductType/GetProductType?productTypeId=${id}`,
             providesTags: ['ProductType']
         }),
         createProductType: builder.mutation({
             query: productType => ({
-                url: '/CreateProductType',
+                url: '/ProductType/CreateProductType',
                 method: 'POST',
                 body: productType
             }),
@@ -137,40 +104,26 @@ export const apiProductTypeSlice = createApi({
         }),
         deleteProductType: builder.mutation({
             query: id => ({
-                url: `/DeleteProductType?productTypeId=${id}`,
+                url: `/ProductType/DeleteProductType?productTypeId=${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: ['ProductType']
-        })
-    })
-});
-
-export const apiOrderSlice = createApi({
-    reducerPath: 'api/Order',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://localhost:5001/api/Order',
-        prepareHeaders: (headers) => {
-            headers.set('authorization', `Bearer ${token}`)
-            return headers;
-        }
-    }),
-    tagTypes: ['Order'],
-    endpoints: builder => ({
+        }),
         getAllOrders: builder.query({
-            query: () => '/GetAllOrders',
+            query: () => '/Order/GetAllOrders',
             providesTags: ['Order']
         }),
-        getOrder: builder.query({
-            query: id => `/GetOrder?orderId=${id}`,
+        getOrder: builder.mutation({
+            query: id => `/Order/GetOrder?orderId=${id}`,
             providesTags: ['Order']
         }),
         getAllOrdersWithItems: builder.query({
-            query: id => `/GetAllOrdersWithItems?userId=${id}`,
+            query: id => `/Order/GetAllOrdersWithItems?userId=${id}`,
             providesTags: ['Order']
         }),
         createNewOrder: builder.mutation({
             query: user => ({
-                url: '/CreateNewOrder',
+                url: '/Order/CreateNewOrder',
                 method: 'POST',
                 body: user
             }),
@@ -178,36 +131,26 @@ export const apiOrderSlice = createApi({
         }),
         changeOrderStatus: builder.mutation({
             query: (orderId, orderStatus) => ({
-                url: `/ChangeOrderStatus?orderId=${orderId}&orderStatus=${orderStatus}`,
+                url: `/Order/ChangeOrderStatus?orderId=${orderId}&orderStatus=${orderStatus}`,
                 method: 'PUT'
             }),
             invalidatesTags: ['Order']
-        })
-    })
-});
-
-export const apiUserSlice = createApi({
-    reducerPath: 'api/User',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://localhost:5001/api/User',
-        prepareHeaders: (headers) => {
-            headers.set('authorization', `Bearer ${token}`)
-            return headers;
-        }
-    }),
-    tagTypes: ['User'],
-    endpoints: builder => ({
+        }),
         getAllUsers: builder.query({
-            query: () => '/GetAllUsers',
+            query: () => '/User/GetAllUsers',
+            providesTags: ['User']
+        }),
+        getUser1: builder.mutation({
+            query: id => `/User/GetUser?userId=${id}`,
             providesTags: ['User']
         }),
         getUser: builder.query({
-            query: id => `/GetUser?userId=${id}`,
+            query: id => `/User/GetUser?userId=${id}`,
             providesTags: ['User']
         }),
         createUser: builder.mutation({
             query: user => ({
-                url: '/CreateUser',
+                url: '/User/CreateUser',
                 method: 'POST',
                 body: user
             }),
@@ -215,14 +158,14 @@ export const apiUserSlice = createApi({
         }),
         deleteUser: builder.mutation({
             query: id => ({
-                url: `/DeleteUser?userId=${id}`,
+                url: `/User/DeleteUser?userId=${id}`,
                 method: 'DELETE'
             }),
             invalidatesTags: ['User']
         }),
         updateUser: builder.mutation({
             query: user => ({
-                url: '/UpdateUser',
+                url: '/User/UpdateUser',
                 method: 'PUT',
                 body: user
             }),
@@ -230,7 +173,7 @@ export const apiUserSlice = createApi({
         }),
         updateUserPassword: builder.mutation({
             query: body => ({
-                url: '/UpdateUserPassword',
+                url: '/User/UpdateUserPassword',
                 method: 'PUT',
                 body: body
             })
@@ -238,42 +181,31 @@ export const apiUserSlice = createApi({
     })
 });
 
-
-export const {
-    useGetAllProductsQuery,
-    useGetProductQuery,
-    useCreateProductMutation,
-    useDeleteProductMutation
-} = apiProductSlice;
-
-export const {
-    useGetAllProductTypesQuery,
-    useGetProductTypeQuery,
-    useCreateProductTypeMutation,
-    useDeleteProductTypeMutation
-} = apiProductTypeSlice;
-
-export const { useLoginMutation } = apiAuthenticationSlice;
-
-export const { 
-    useGetItemsFromCartQuery,
-    useUpdateCartMutation,
-    useClearCartMutation
-} = apiCartSlice;
-
-export const {
-    useGetAllOrdersQuery,
-    useGetAllOrdersWithItemsQuery,
-    useGetOrderQuery,
-    useCreateNewOrderMutation,
-    useChangeOrderStatusMutation
-} = apiOrderSlice;
-
 export const {
     useGetAllUsersQuery,
+    useGetUser1Mutation,
     useGetUserQuery,
     useCreateUserMutation,
     useDeleteUserMutation,
     useUpdateUserMutation,
-    useUpdateUserPasswordMutation
-} = apiUserSlice;
+    useUpdateUserPasswordMutation,
+    useGetAllOrdersQuery,
+    useGetAllOrdersWithItemsQuery,
+    useGetOrderMutation,
+    useCreateNewOrderMutation,
+    useChangeOrderStatusMutation,
+    useGetItemsFromCartQuery,
+    useUpdateCartMutation,
+    useClearCartMutation,
+    useGetAllProductTypesQuery,
+    useGetProductTypeQuery,
+    useCreateProductTypeMutation,
+    useDeleteProductTypeMutation,
+    useGetAllProductsQuery,
+    useGetProductQuery,
+    useCreateProductMutation,
+    useDeleteProductMutation,
+    useAddPictureToProductMutation,
+    useUpdateProductMutation,
+    useLoginMutation
+} = apiSlice;

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Accordion, Spinner, Table } from "react-bootstrap";
 import { useAuth } from "../../hooks/auth.hook";
 import { useGetAllOrdersWithItemsQuery } from "../../api/apiSlice";

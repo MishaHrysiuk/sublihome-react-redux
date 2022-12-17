@@ -15,7 +15,7 @@ import { useAuth } from "../../hooks/auth.hook";
 
 const ProductsPage = () => {
 
-    const { login, logout, currentUserId } = useAuth();
+    const { currentUserId } = useAuth();
 
     const {
         currentPage,
@@ -110,12 +110,6 @@ const ProductsPage = () => {
 
     return (
         <div className="block">
-            <Button onClick={() => {
-                login({ email: 'admin@gmail.com', password: 'admin' });
-            }}>Login</Button>
-            <Button onClick={() => {
-                logout();
-            }}>Logout</Button>
             <div className="container">
                 <div className="block__title title">Наші товари</div>
                 <Card className="mb-3">

@@ -7,7 +7,8 @@ import {
     SignInPage,
     SignUpPage,
     CartPage,
-    OrdersPage
+    OrdersPage,
+    AdminPage
 } from "../pages";
 import React from "react";
 import './app.scss'
@@ -62,11 +63,11 @@ const App = () => {
                         <Navigate replace to ='/'/>
                     ) : (<SignUpPage />)}
                 />
-                {/* <Route path="admin"
+                <Route path="admin"
                     element={!currentUserIsAdmin ? (
                         <Navigate replace to ='/'/>
                     ) : (<AdminPage />)}
-                /> */}
+                />
             </Routes>
         </BrowserRouter>
     )

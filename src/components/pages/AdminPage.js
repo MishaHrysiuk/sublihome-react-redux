@@ -1,27 +1,32 @@
-import axios from "axios"
 import { useEffect, useState } from "react"
 import { Pagination, Table, Spinner, Button, Modal, Form, Col, Row} from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
-import { errorInterceptor } from "../../helpers/error-interceptor"
-import DefaultsAxios from "../../helpers/jwt-interceptor"
-import { OrderService, ProductService, UserService } from "../../services/sublihome-service"
+import {
+    useGetAllOrdersQuery,
+    useChangeOrderStatusMutation,
+    useGetOrderMutation,
+    useGetUser1Mutation,
+    useGetAllProductsQuery,
+    useCreateProductMutation,
+    useAddPictureToProductMutation,
+    useUpdateProductMutation
+} from "../../api/apiSlice"
 
 const AdminPage = () => {
-    const orderService = new OrderService(axios.defaults.baseURL, DefaultsAxios);
-    const userService = new UserService(axios.defaults.baseURL, DefaultsAxios);
-    const productService = new ProductService(axios.defaults.baseURL, DefaultsAxios);
-
     const navigate = useNavigate();
 
-    const [loadingOrders, setLoadingOrders] = useState(true)
-    const [loadingProducts, setLoadingProducts] = useState(true)
-    const [ordersList, setOrdersList] = useState([])
-    const [productsList, setProductsList] = useState([])
+    const { data: ordersList = [], isLoading: loadingOrders } = useGetAllOrdersQuery();
+    const { data: productsList = [], isLoading: loadingProducts } = useGetAllProductsQuery();
+    const [changeOrderStatus] = useChangeOrderStatusMutation();
+    const [getOrder] = useGetOrderMutation();
+    const [getUser] = useGetUser1Mutation();
+    const [createProduct] = useCreateProductMutation();
+    const [addPictureToProduct] = useAddPictureToProductMutation();
+    const [updateProduct] = useUpdateProductMutation();
+
     const [statusList, setStatusList] = useState([])
     const [productsCount, setProductsCount] = useState([]);
     const [productIds, setProductIds] = useState([]);
-    const [change, setChange] = useState(false);
-    const [changeProduct, setChangeProduct] = useState(false);
 
     const [id, setId] = useState('')
     const [name, setName] = useState('')
@@ -43,59 +48,11 @@ const AdminPage = () => {
     const [showUpdate, setUpdate] = useState(false);
 
     useEffect(() => {
-        onRequestOrder();
-        onRequestProduct();
-    }, [])
-
-    useEffect(() => {
-        onRequestProduct();
-        setLoadingProducts(true)
-    }, [changeProduct])
+        setStatusList(ordersList.map(item => item.statusId))
+    }, [ordersList])
     
-    useEffect(() => {}, [change])
-
-    const onRequestOrder = () => {
-        orderService.getAllOrders()
-            .then(res => onOrdersLoaded(res.reverse()))
-            .catch(err => {
-                setLoadingOrders(false);
-                errorInterceptor(err)
-            })
-    } 
-    
-    const onRequestProduct = () => {
-        productService.getAllProducts()
-            .then(onProductsLoaded)
-            .catch(err => {
-                setLoadingProducts(false);
-                errorInterceptor(err)
-            })
-    }
-
-    const onOrdersLoaded = (list) => {
-        setStatusList(list.map(item => item.statusId))
-        setOrdersList(list);
-        setLoadingOrders(false)
-    }
-
-    const onProductsLoaded = (list) => {
-        setProductsList(list);
-        setLoadingProducts(false)
-    }
-
-
-    const changeOrderStatus = (index, id, status) => {
-        const list = statusList
-        list[index] = status;
-        setStatusList(list)
-        orderService.changeOrderStatus(id, status)
-            .then()
-            .catch(errorInterceptor)
-        setChange(change => !change)
-    }
-
-    const orderInfo = (id) => {
-        orderService.getOrder(id)
+    const orderInfo = async(id) => {
+        await getOrder(id)
             .then(res => {
                 setProductIds(res.productIds)
                 setProductsCount(res.productsCount)
@@ -104,8 +61,8 @@ const AdminPage = () => {
         
     }
 
-    const userInfo = (id) => {
-        userService.getUser(id)
+    const userInfo = async (id) => {
+        await getUser(id)
             .then(user => {
                 setFirstName(user.firstName)
                 setLastName(user.lastName)
@@ -116,7 +73,6 @@ const AdminPage = () => {
                 setEmail(user.email)
                 setShowUser(true)
             })
-            .catch(errorInterceptor)
         
     }
 
@@ -127,7 +83,7 @@ const AdminPage = () => {
         setUpdate(true)
     }
 
-    const getOrders = (arr, arrStatus) => {
+    const renderOrders = (arr, arrStatus) => {
         const items = arr.map((item, index) => {
             return (
                 <tr key={item.id}>
@@ -138,7 +94,7 @@ const AdminPage = () => {
                     <td>
                         <Form.Select style={(arrStatus[index] == 3) ? { backgroundColor: '#FF0000' } :
                             (arrStatus[index] == 2) ? { backgroundColor: '#00FF00' } : { backgroundColor: '#FFFF00' }}
-                            onChange={(e) => { changeOrderStatus(index, item.id, e.target.value)}}
+                            onChange={(e) => { changeOrderStatus(item.id, e.target.value)}}
                             value={arrStatus[index]}>
                             <option style={{backgroundColor: '#FFFFFF'}} value="1">Pending</option>
                             <option style={{backgroundColor: '#FFFFFF'}} value="2">Approved</option>
@@ -168,7 +124,7 @@ const AdminPage = () => {
         )
     }
 
-    const getProductList = (arr) => {
+    const renderProductList = (arr) => {
         const items = arr.map(item => {
             return (
                 <tr key={item.id}>
@@ -200,7 +156,7 @@ const AdminPage = () => {
         )
     }
 
-    const getProducts = (listId, listCount) => {
+    const renderProducts = (listId, listCount) => {
         const items = listId.map((item, index) => {
             return (
                 <tr key={item}>
@@ -225,7 +181,7 @@ const AdminPage = () => {
         )
     }
 
-    const getUser = () => {
+    const renderUser = () => {
         return (
             <Table striped bordered hover>
                 <tbody>
@@ -262,43 +218,41 @@ const AdminPage = () => {
         )
     }
     
-    const updateProduct = async (e) => {
+    const updateProduct1 = async (e) => {
         e.preventDefault()
         if (!!name && !!price) {
-            await productService.updateProduct({
+            await updateProduct({
                 id, name, price
             }).then(res => {
                 alert("Saved");
                 setName('')
                 setPrice('')
-                setChangeProduct(changeProduct => !changeProduct)
-            }).catch(errorInterceptor)
+            })
             if (!!picture) {
-                await productService.addPictureToProduct(id, picture)
+                await addPictureToProduct(id, picture)
                     .then(res => {
                         setPicture('')
-                    }).catch(errorInterceptor)
+                    })
             }
         }
     }
     
-    const createProduct = async (e) => {
+    const createProduct1 = async (e) => {
         e.preventDefault()
         if (!!name && !!price  && !!type) {
-            await productService.createProduct({
+            await createProduct({
                 name, price, productType: type
             }).then(res => {
                 alert("Create");
                 setName('')
                 setPrice('')
                 setType('')
-                setChangeProduct(changeProduct => !changeProduct)
-            }).catch(errorInterceptor)
+            })
         }
     }
 
-    const items = getOrders(ordersList, statusList);
-    const products = getProductList(productsList)
+    const items = renderOrders(ordersList, statusList);
+    const products = renderProductList(productsList)
     const spinnerProducts = loadingProducts ? <Spinner animation="border" variant="info" /> : null;
     const spinnerOrders = loadingOrders ? <Spinner animation="border" variant="info" /> : null;
     const contentProducts = !loadingProducts ? products : null;
@@ -328,7 +282,7 @@ const AdminPage = () => {
                     <Modal.Title>Products</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {getProducts(productIds, productsCount)}
+                    {renderProducts(productIds, productsCount)}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowProducts(false)}>
@@ -343,7 +297,7 @@ const AdminPage = () => {
                     <Modal.Title>User</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {getUser()}
+                    {renderUser()}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowUser(false)}>
@@ -357,7 +311,7 @@ const AdminPage = () => {
                     <Modal.Title>Update product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={(e) => updateProduct(e)}>
+                    <Form onSubmit={(e) => updateProduct1(e)}>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
                             <Form.Control
@@ -398,7 +352,7 @@ const AdminPage = () => {
                     <Modal.Title>Create product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={(e) => createProduct(e)}>
+                    <Form onSubmit={(e) => createProduct1(e)}>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
                             <Form.Control

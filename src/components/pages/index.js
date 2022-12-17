@@ -3,7 +3,7 @@ import MainPage from "./MainPage";
 import CartPage from "./CartPage";
 import ProductsPage from "./ProductsPage";
 import ProfilePage from "./ProfilePage";
-// import AdminPage from "./AdminPage";
+import AdminPage from "./AdminPage";
 import SignInPage from "./SignInPage";
 import HomePage from "./HomePage";
 import SignUpPage from "./SignUpPage";
@@ -18,6 +18,6 @@ export {
     SignInPage,
     SignUpPage,
     CartPage,
-    // AdminPage,
+    AdminPage,
     OrdersPage
 };
