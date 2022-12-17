@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import App from './components/app/App';
 import store from './store';
 
-import './styles/index.scss';
+import './style/index.scss';
 
 const container = document.getElementById('root');
 const root = createRoot(container);

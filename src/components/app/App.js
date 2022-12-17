@@ -3,7 +3,11 @@ import {
     MainPage,
     HomePage,
     AboutUsPage,
-    ProfilePage
+    ProfilePage,
+    SignInPage,
+    SignUpPage,
+    CartPage,
+    OrdersPage
 } from "../pages";
 import React from "react";
 import './app.scss'
@@ -35,7 +39,7 @@ const App = () => {
                         path="products"
                         element={<ProductsPage />}
                     />
-                    {/* <Route
+                    <Route
                         path="cart"
                         element={!isLoggedIn ? (
                             <Navigate replace to ='/sign_in'/>
@@ -46,9 +50,9 @@ const App = () => {
                         element={!isLoggedIn ? (
                             <Navigate replace to ='/sign_in'/>
                             ) : (<OrdersPage />)}
-                    /> */}
+                    />
                 </Route>
-                {/* <Route path="sign_in"
+                <Route path="sign_in"
                     element={isLoggedIn ? (
                         <Navigate replace to ='/'/>
                     ) : (<SignInPage />)}
@@ -58,7 +62,7 @@ const App = () => {
                         <Navigate replace to ='/'/>
                     ) : (<SignUpPage />)}
                 />
-                <Route path="admin"
+                {/* <Route path="admin"
                     element={!currentUserIsAdmin ? (
                         <Navigate replace to ='/'/>
                     ) : (<AdminPage />)}

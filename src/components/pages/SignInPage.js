@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { Form, Button, Card } from "react-bootstrap"
 import { Link } from "react-router-dom";
-import { authenticationService } from "../../services/auth-service";
+import { useAuth } from "../../hooks/auth.hook";
 
 const SignInPage = () => {
 
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -16,10 +17,10 @@ const SignInPage = () => {
         setPassword(e.target.value)
     }
 
-    function login(e) {
+    function loginUser(e) {
         e.preventDefault()
         if (!!email && !!password) {
-            authenticationService.login(email, password)
+            login({ email, password })
             setEmail('')
             setPassword('')
         }
@@ -31,7 +32,7 @@ const SignInPage = () => {
                 <Card border="info" style={{ width: '20rem' }}>
                     <Card.Header as="h3">Вхід в систему</Card.Header>
                     <Card.Body>
-                            <Form onSubmit={login}>
+                            <Form onSubmit={loginUser}>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Електронна пошта</Form.Label>
                                     <Form.Control type="email"

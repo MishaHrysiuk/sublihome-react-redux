@@ -1,13 +1,14 @@
-import axios from "axios";
 import { useState } from "react"
 import { Form, Button, Card, Row, Col, InputGroup } from "react-bootstrap"
 import { Link } from "react-router-dom";
-import { UserService } from "../../services/sublihome-service";
-import { authenticationService } from "../../services/auth-service";
-import { errorInterceptor } from "../../helpers/error-interceptor";
+import { useAuth } from "../../hooks/auth.hook";
+import {
+    useCreateUserMutation,
+} from "../../api/apiSlice";
 
 const SignUpPage = () => {
-    const userService = new UserService(axios.defaults.baseURL)
+    const [createUser] = useCreateUserMutation();
+    const { login } = useAuth();
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -22,15 +23,15 @@ const SignUpPage = () => {
     async function registration(e) {
         e.preventDefault()
         if (!!email && !!password && !!firstName && !!lastName && !!city && !!street && !!houseNumber && !!phoneNumber && (password === passwordConfirm)) {
-            await userService.createUser({
+            await createUser({
                 firstName,
                 lastName,
                 address: `${city}, ${street}, ${houseNumber}`,
                 phoneNumber: `+380${phoneNumber}`,
                 email,
                 password
-            }).then().catch(errorInterceptor)
-            await authenticationService.login(email, password);
+            }).unwrap();
+            await login({ email, password });
             e.target.getElementsByTagName('input')[8].style.backgroundColor = '#FFFFFF';
             e.target.getElementsByTagName('input')[8].style.color = '#000000';  
             setFirstName('')
