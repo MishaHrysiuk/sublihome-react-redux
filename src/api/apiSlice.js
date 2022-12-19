@@ -36,9 +36,12 @@ export const apiSlice = createApi({
             invalidatesTags: ['Product']
         }),
         addPictureToProduct: builder.mutation({
-            query: (id, file) => ({
+            query: ({ id, file }) => ({
                 url: `/Product/AddPictureToProduct?productId=${id}`,
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
                 body: file
             }),
             invalidatesTags: ['Product']
@@ -130,7 +133,7 @@ export const apiSlice = createApi({
             invalidatesTags: ['Order']
         }),
         changeOrderStatus: builder.mutation({
-            query: (orderId, orderStatus) => ({
+            query: ({ orderId, orderStatus }) => ({
                 url: `/Order/ChangeOrderStatus?orderId=${orderId}&orderStatus=${orderStatus}`,
                 method: 'PUT'
             }),

@@ -19,7 +19,6 @@ const OrdersPage = () => {
     }
 
     const getOrders = (arr) => {
-        console.log(arr)
         const items = arr.map((item) => {
             return (
                 <Accordion.Item

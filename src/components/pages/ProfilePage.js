@@ -10,7 +10,7 @@ import {
 import { useAuth } from "../../hooks/auth.hook";
 
 const ProfilePage = () => {
-    const {isLoggedIn, currentUserId, currentUserIsAdmin, logout } = useAuth()
+    const { currentUserId, currentUserIsAdmin, logout } = useAuth()
     const {
         data: user,
         isLoading,
@@ -46,6 +46,7 @@ const ProfilePage = () => {
         if (isSuccess) {
             onUserLoaded(user);
         }
+        // eslint-disable-next-line
     }, [user])
     
 

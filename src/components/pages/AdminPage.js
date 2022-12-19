@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react"
-import { Pagination, Table, Spinner, Button, Modal, Form, Col, Row} from "react-bootstrap"
+import { useState } from "react"
+import { Table, Spinner, Button, Modal, Form, Col, Row} from "react-bootstrap"
 import { useNavigate } from "react-router-dom"
 import {
     useGetAllOrdersQuery,
@@ -24,7 +24,6 @@ const AdminPage = () => {
     const [addPictureToProduct] = useAddPictureToProductMutation();
     const [updateProduct] = useUpdateProductMutation();
 
-    const [statusList, setStatusList] = useState([])
     const [productsCount, setProductsCount] = useState([]);
     const [productIds, setProductIds] = useState([]);
 
@@ -46,13 +45,9 @@ const AdminPage = () => {
     const [showUser, setShowUser] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
     const [showUpdate, setUpdate] = useState(false);
-
-    useEffect(() => {
-        setStatusList(ordersList.map(item => item.statusId))
-    }, [ordersList])
     
-    const orderInfo = async(id) => {
-        await getOrder(id)
+    const orderInfo = async (id) => {
+        await getOrder(id).unwrap()
             .then(res => {
                 setProductIds(res.productIds)
                 setProductsCount(res.productsCount)
@@ -63,6 +58,7 @@ const AdminPage = () => {
 
     const userInfo = async (id) => {
         await getUser(id)
+            .unwrap()
             .then(user => {
                 setFirstName(user.firstName)
                 setLastName(user.lastName)
@@ -83,8 +79,8 @@ const AdminPage = () => {
         setUpdate(true)
     }
 
-    const renderOrders = (arr, arrStatus) => {
-        const items = arr.map((item, index) => {
+    const renderOrders = (arr) => {
+        const items = arr.map((item) => {
             return (
                 <tr key={item.id}>
                     <td>{item.id}</td>
@@ -92,10 +88,10 @@ const AdminPage = () => {
                     <td><Button variant="info" onClick={() => orderInfo(item.id)}>Products</Button></td>
                     <td>{item.totalPrice}</td>
                     <td>
-                        <Form.Select style={(arrStatus[index] == 3) ? { backgroundColor: '#FF0000' } :
-                            (arrStatus[index] == 2) ? { backgroundColor: '#00FF00' } : { backgroundColor: '#FFFF00' }}
-                            onChange={(e) => { changeOrderStatus(item.id, e.target.value)}}
-                            value={arrStatus[index]}>
+                        <Form.Select style={(+item.statusId === 3) ? { backgroundColor: '#FF0000' } :
+                            (+item.statusId === 2) ? { backgroundColor: '#00FF00' } : { backgroundColor: '#FFFF00' }}
+                            onChange={(e) => { changeOrderStatus({ orderId: item.id, orderStatus: e.target.value }).unwrap()}}
+                            value={item.statusId}>
                             <option style={{backgroundColor: '#FFFFFF'}} value="1">Pending</option>
                             <option style={{backgroundColor: '#FFFFFF'}} value="2">Approved</option>
                             <option style={{backgroundColor: '#FFFFFF'}} value="3">Rejected</option>
@@ -218,18 +214,18 @@ const AdminPage = () => {
         )
     }
     
-    const updateProduct1 = async (e) => {
-        e.preventDefault()
+    const onUpdateProduct = async (e) => {
+        e.preventDefault();
         if (!!name && !!price) {
             await updateProduct({
                 id, name, price
-            }).then(res => {
+            }).unwrap().then(res => {
                 alert("Saved");
                 setName('')
                 setPrice('')
             })
             if (!!picture) {
-                await addPictureToProduct(id, picture)
+                await addPictureToProduct({ id, file: picture }).unwrap()
                     .then(res => {
                         setPicture('')
                     })
@@ -237,7 +233,7 @@ const AdminPage = () => {
         }
     }
     
-    const createProduct1 = async (e) => {
+    const onCreateProduct = async (e) => {
         e.preventDefault()
         if (!!name && !!price  && !!type) {
             await createProduct({
@@ -251,7 +247,7 @@ const AdminPage = () => {
         }
     }
 
-    const items = renderOrders(ordersList, statusList);
+    const items = renderOrders(ordersList);
     const products = renderProductList(productsList)
     const spinnerProducts = loadingProducts ? <Spinner animation="border" variant="info" /> : null;
     const spinnerOrders = loadingOrders ? <Spinner animation="border" variant="info" /> : null;
@@ -311,7 +307,7 @@ const AdminPage = () => {
                     <Modal.Title>Update product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={(e) => updateProduct1(e)}>
+                    <Form onSubmit={onUpdateProduct}>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
                             <Form.Control
@@ -332,8 +328,8 @@ const AdminPage = () => {
                             <Form.Label>Picture</Form.Label>
                             <Form.Control
                                 type="file"
-                                accept="image/png"
-                                onChange={(e) => setPicture({ data: e.target.files[0] }) }/>
+                                accept="image/*"
+                                onChange={(e) => { console.log(e.target.files[0]);  setPicture(e.target.files[0]) } }/>
                         </Form.Group>
                         <Button variant="success" type="submit">
                             Зберегти
@@ -352,7 +348,7 @@ const AdminPage = () => {
                     <Modal.Title>Create product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form onSubmit={(e) => createProduct1(e)}>
+                    <Form onSubmit={onCreateProduct}>
                         <Form.Group className="mb-3">
                             <Form.Label>Name</Form.Label>
                             <Form.Control
